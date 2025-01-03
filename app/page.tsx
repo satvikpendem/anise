@@ -9,7 +9,6 @@ import {
 	CardContent,
 	CardFooter,
 } from "@/components/ui/card";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { handleSubmit } from "@/lib/actions";
 import { redirect } from "next/navigation";
 
@@ -32,7 +31,7 @@ export default function Home() {
 							</div> */}
 							<div>
 								<p>Test</p>
-								<ToggleGroup
+								{/* <ToggleGroup
 									type="multiple"
 									className="flex flex-col gap-2 align-top items-start pl-4"
 								>
@@ -41,7 +40,7 @@ export default function Home() {
 									</ToggleGroupItem>
 									<ToggleGroupItem value="2">Option 2</ToggleGroupItem>
 									<ToggleGroupItem value="3">Option 3</ToggleGroupItem>
-								</ToggleGroup>
+								</ToggleGroup> */}
 							</div>
 						</CardContent>
 						<CardFooter className="flex justify-between">
