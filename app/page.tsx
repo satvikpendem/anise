@@ -7,7 +7,6 @@ import {
 	CardContent,
 	CardFooter,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { parseData } from "@/lib/parsing";
 import { Label } from "@radix-ui/react-label";
 import { CheckboxGroup } from "@radix-ui/themes";
@@ -18,6 +17,7 @@ export default async function Home() {
 
 	const handleSubmit = async (formData: FormData) => {
 		"use server";
+		console.log(formData.getAll("preferences"));
 	};
 
 	return (
@@ -34,19 +34,11 @@ export default async function Home() {
 					<form action={handleSubmit}>
 						<CardContent>
 							<h2>Test</h2>
-							<div className="flex items-center gap-4 p-4">
-								{/* <Checkbox name="test" value="test" id="test" />
-								<label
-									htmlFor="test"
-									className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								>
-									Test
-								</label> */}
-								<CheckboxGroup.Root>
-									<CheckboxGroup.Item value="test">Hello</CheckboxGroup.Item>
-									<CheckboxGroup.Item value="test">Hello</CheckboxGroup.Item>
-									<CheckboxGroup.Item value="test">Hello</CheckboxGroup.Item>
-									<CheckboxGroup.Item value="test">Hello</CheckboxGroup.Item>
+							<div className="flex flex-col items-start gap-4 p-4">
+								<CheckboxGroup.Root name="preferences">
+									<CheckboxGroup.Item value="1">Hello</CheckboxGroup.Item>
+									<CheckboxGroup.Item value="2">There</CheckboxGroup.Item>
+									<CheckboxGroup.Item value="3">Today</CheckboxGroup.Item>
 								</CheckboxGroup.Root>
 							</div>
 						</CardContent>
