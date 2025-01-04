@@ -4,11 +4,13 @@ import csv from "csvtojson";
 import {
 	type Therapist,
 	type RawTherapist,
+	validEthnicIdentities,
 	validGenders,
 	validSexualOrientations,
 	validReligiousBackgrounds,
 	validTreatmentModalities,
 	validAreasOfSpecialization,
+	validLocations,
 	validPaymentMethods,
 } from "./types";
 
@@ -45,7 +47,15 @@ function validate<T extends string>(
 	return compareData(input, validValues) ? (input as T) : defaultValue;
 }
 
-// To parse a field that contains only one value of a set of possible values
+/**
+ * Parse a field that contains only one value of a set of possible values, such as
+ * "A" out of ["A", "B", "C"]. If the input is not in the validValues array, we return the defaultValue.
+ *
+ * @param input Raw input string
+ * @param validValues Array of valid values that we want and we return the default value if the input is not in the array
+ * @param defaultValue The default value we should use if the input is not in the array
+ * @returns One of the valid values or the default value
+ */
 function parseOneField<T extends string>(
 	input: string,
 	validValues: T[],
@@ -54,7 +64,15 @@ function parseOneField<T extends string>(
 	return validate(input, validValues, defaultValue);
 }
 
-// Parse a field that contains many values of a set of possible values
+/**
+ * Parse a field that contains many values of a set of possible values, such as
+ * "A, B, C" out of ["A", "B", "C", "D", "E"]. If the input is not in the validValues array, we return the defaultValue.
+ *
+ * @param input Raw input string
+ * @param validValues Array of valid values that we want and we return the default value if the input is not in the array
+ * @param defaultValue Default value to use if the input is not in the array
+ * @returns Array of valid values or an array with the default value
+ */
 function parseManyField<T extends string>(
 	input: string,
 	validValues: T[],
@@ -64,11 +82,21 @@ function parseManyField<T extends string>(
 	const values = processedInput.map((value) =>
 		validate(value, validValues, defaultValue),
 	);
+	// Use a set to remove duplicates
 	return new Set(values).values().toArray();
 }
 
-export async function parseData(url: string): Promise<Therapist[]> {
-	const rawData = await csv({ delimiter: "\t" }).fromFile(url);
+/**
+ * We have the raw data in a file, so we need to parse it into JSON. We use separate parsers for each field to ensure that the data is in the correct format.
+ *
+ * @param filePath file path of the data file, defaults to tsv
+ * @returns
+ */
+export async function parseData(
+	filePath: string,
+	delimiter = "\t",
+): Promise<Therapist[]> {
+	const rawData = await csv({ delimiter }).fromFile(filePath);
 
 	return rawData.map(
 		({
@@ -109,7 +137,7 @@ function parseName(first: string, last: string): Therapist["name"] {
 function parseEthnicIdentity(
 	ethnicIdentity: string,
 ): Therapist["ethnicIdentity"] {
-	return splitData(ethnicIdentity);
+	return parseManyField(ethnicIdentity, validEthnicIdentities, "Other");
 }
 
 function parseGenderIdentity(
@@ -127,7 +155,7 @@ function parseLanguage(language: string): Therapist["language"] {
 }
 
 function parseLocation(location: string): Therapist["location"] {
-	return splitData(location);
+	return parseManyField(location, validLocations, "Other");
 }
 
 function parseBio(bio: string): Therapist["bio"] {
@@ -137,7 +165,7 @@ function parseBio(bio: string): Therapist["bio"] {
 function parseSexualOrientation(
 	sexualOrientation: string,
 ): Therapist["sexualOrientation"] {
-	return parseOneField(sexualOrientation, validSexualOrientations, "Other");
+	return parseManyField(sexualOrientation, validSexualOrientations, "Other");
 }
 
 function parseReligiousBackground(

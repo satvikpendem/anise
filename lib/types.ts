@@ -1,3 +1,22 @@
+export const validEthnicIdentities = [
+	"American",
+	"White",
+	"Black",
+	"Hispanic",
+	"Native American",
+	"Chinese",
+	"Japanese",
+	"Korean",
+	"Taiwanese",
+	"Indian",
+	"Vietnamese",
+	"Southeast Asian",
+	"Sri Lankan",
+	"African American",
+	"Other",
+	"Prefer not to say",
+] as const satisfies string[];
+
 export const validGenders = [
 	"Male",
 	"Female",
@@ -89,12 +108,77 @@ export const validAreasOfSpecialization = [
 	"Other",
 ] as const satisfies string[];
 
+export const validLocations = [
+	"AL",
+	"AK",
+	"AZ",
+	"AR",
+	"CA",
+	"CO",
+	"CT",
+	"DE",
+	"FL",
+	"GA",
+	"HI",
+	"ID",
+	"IL",
+	"IN",
+	"IA",
+	"KS",
+	"KY",
+	"LA",
+	"ME",
+	"MD",
+	"MA",
+	"MI",
+	"MN",
+	"MS",
+	"MO",
+	"MT",
+	"NE",
+	"NV",
+	"NH",
+	"NJ",
+	"NM",
+	"NY",
+	"NC",
+	"ND",
+	"OH",
+	"OK",
+	"OR",
+	"PA",
+	"RI",
+	"SC",
+	"SD",
+	"TN",
+	"TX",
+	"UT",
+	"VT",
+	"VA",
+	"WA",
+	"WV",
+	"WI",
+	"WY",
+	"Other",
+] as const satisfies string[];
+
 export const validPaymentMethods = [
 	"Aetna",
 	"Magellan",
 	"Anthem",
 	"Self-pay",
 ] as const satisfies string[];
+
+export const preferenceTypeToValidPreferences: Record<string, string[]> = {
+	ethnicIdentity: validEthnicIdentities,
+	genderIdentity: validGenders,
+	sexualOrientation: validSexualOrientations,
+	religiousBackground: validReligiousBackgrounds,
+	treatmentModality: validTreatmentModalities,
+	areasOfSpecialization: validAreasOfSpecialization,
+	location: validLocations,
+	paymentMethods: validPaymentMethods,
+};
 
 export type RawTherapist = {
 	firstName: string;
@@ -114,26 +198,49 @@ export type RawTherapist = {
 
 export type Therapist = {
 	name: string;
-	ethnicIdentity: string[];
+	ethnicIdentity: (typeof validEthnicIdentities)[number][];
 	genderIdentity: (typeof validGenders)[number];
 	availability: number;
 	language: string[];
 	location: string[];
 	bio: string;
-	sexualOrientation: (typeof validSexualOrientations)[number];
+	sexualOrientation: (typeof validSexualOrientations)[number][];
 	religiousBackground: (typeof validReligiousBackgrounds)[number];
 	treatmentModality: (typeof validTreatmentModalities)[number][];
 	areasOfSpecialization: (typeof validAreasOfSpecialization)[number][];
 	paymentMethods: (typeof validPaymentMethods)[number][];
+	[key: string]: string | string[] | number;
 };
 
-export type PatientInput = Pick<
-	Therapist,
-	| "genderIdentity"
-	| "sexualOrientation"
-	| "religiousBackground"
-	| "treatmentModality"
-	| "areasOfSpecialization"
-	| "location"
-	| "paymentMethods"
->;
+export type PatientInput = {
+	[K in keyof Pick<
+		Therapist,
+		| "genderIdentity"
+		| "sexualOrientation"
+		| "religiousBackground"
+		| "treatmentModality"
+		| "areasOfSpecialization"
+		| "location"
+		| "paymentMethods"
+	>]: Therapist[K] extends Array<string> ? Therapist[K] : Therapist[K][];
+};
+
+type ValidElementKeys = {
+	[K in keyof PatientInput]: PatientInput[K] extends (infer U)[] ? U : never;
+}[keyof PatientInput];
+
+export type ValidElements = {
+	name: string;
+	heading: string;
+	subheading: string;
+	elements: ValidElementKeys[];
+};
+
+export type SearchParams = Promise<{
+	[key: string]: string | string[] | undefined;
+}>;
+
+export type TherapistMatchOutput = {
+	bioType: keyof Therapist;
+	heading: string;
+}[];
