@@ -43,7 +43,7 @@ async function parseSearchParams(searchParams: SearchParams) {
  * @returns The top three therapists that match the patient's preferences
  */
 async function evaluate(data: PatientInput) {
-	const therapists = await parseData("./data/data.tsv");
+	const therapists = await parseData("./public/data.tsv");
 	const matches: (Therapist & { matchCount: number })[] = [];
 
 	const therapistsWithAvailability = therapists.filter(
